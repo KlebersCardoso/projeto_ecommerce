@@ -1,0 +1,146 @@
+Table structure for table `cliente`
+
+CREATE TABLE `cliente` (
+`idCliente` int NOT NULL AUTO_INCREMENT,
+`nome` varchar(30) NOT NULL,
+`sobrenome` varchar(30) DEFAULT NULL,
+`dataNascimento` date DEFAULT NULL,
+`Cpf` char(11) NOT NULL,
+`sexo` enum('M','F') DEFAULT NULL,
+`endereço` varchar(50) DEFAULT NULL,
+`telefone` char(11) DEFAULT NULL,
+PRIMARY KEY (`idCliente`),
+UNIQUE KEY `cpf_cliente` (`Cpf`)
+
+
+INSERT INTO `cliente` VALUES (1,'Rogério',NULL,NULL,'36525415607',NULL,NULL,NULL),(8,'Roberto','Cardoso','1980-05-25','26524526508','M','Rua São Teodoro n 165','996695445'),(9,'Marcio','Novaes','1980-05-15','26524526406','M','Rua São Teodoro n 14','996695444'),(10,'Raquel','Alves','1980-06-24','26524524515','F','Rua São Teodoro n 245','996695445');
+
+
+Table structure for table `estoque`
+
+
+CREATE TABLE `estoque` (
+`idEstoque` int NOT NULL AUTO_INCREMENT,
+`descricao` varchar(70) DEFAULT NULL,
+`quantidade` int DEFAULT '0',
+PRIMARY KEY (`idEstoque`)
+
+INSERT INTO `estoque` VALUES (1,'Aparelho de Som',10),(2,'Televisão',10),(3,'Bola',20),(4,'Mause',30);
+-- Table structure for table `fornecedor`
+
+Table structure for table `fornecedor`
+
+
+CREATE TABLE `fornecedor` (
+`idFornecedor` int NOT NULL AUTO_INCREMENT,
+`razaoSocial` varchar(45) NOT NULL,
+`Cnpj` char(14) NOT NULL,
+`contato` char(15) NOT NULL,
+PRIMARY KEY (`idFornecedor`),
+UNIQUE KEY `razaoSocial` (`razaoSocial`),
+UNIQUE KEY `Cnpj` (`Cnpj`)
+
+INSERT INTO `fornecedor` VALUES (1,'Eletronovidades','45662165815447','Mauricio'),(2,'Brinquedoteca','15462165815447','Rodolfo'),(3,'Alimentos S/A','58962165815447','Maria'),(4,'Lojao Informática','56862165815447','Rose');
+
+
+Table structure for table `fornecedor_produto`
+
+
+CREATE TABLE `fornecedor_produto` (
+`idprodutoForn` int NOT NULL,
+`idfornecedorProd` int NOT NULL,
+PRIMARY KEY (`idprodutoForn`,`idfornecedorProd`),
+KEY `idfornecedorProd` (`idfornecedorProd`),
+CONSTRAINT `fornecedor_produto_ibfk_1` FOREIGN KEY (`idprodutoForn`) REFERENCES `produto` (`idProduto`),
+CONSTRAINT `fornecedor_produto_ibfk_2` FOREIGN KEY (`idfornecedorProd`) REFERENCES `fornecedor` (`idFornecedor`)
+
+INSERT INTO `fornecedor_produto` VALUES (1,1),(2,2),(3,3),(4,4);
+
+Table structure for table `pedido`
+
+
+CREATE TABLE `pedido` (
+`idPedido` int NOT NULL AUTO_INCREMENT,
+`dataPedido` date DEFAULT NULL,
+`formaPagamento` varchar(30) DEFAULT NULL,
+`idclientePed` int NOT NULL,
+PRIMARY KEY (`idPedido`),
+KEY `idclientePed` (`idclientePed`),
+CONSTRAINT `pedido_ibfk_1` FOREIGN KEY (`idclientePed`) REFERENCES `cliente` (`idCliente`)
+
+INSERT INTO `pedido` VALUES (1,'2022-05-15','Dinheiro',1),(2,'2022-05-15','Dinheiro',8),(3,'2022-05-15','Dinheiro',9),(4,'2022-05-15','Dinheiro',10);
+
+
+Table structure for table `pedidos_produtos`
+
+
+CREATE TABLE `pedidos_produtos` (
+`idpedidosProd` int NOT NULL,
+`idprodutoPed` int NOT NULL,
+`quantidade` int DEFAULT '0',
+`subTotal` float DEFAULT NULL,
+PRIMARY KEY (`idpedidosProd`,`idprodutoPed`),
+KEY `idprodutoPed` (`idprodutoPed`),
+CONSTRAINT `pedidos_produtos_ibfk_1` FOREIGN KEY (`idpedidosProd`) REFERENCES `pedido` (`idPedido`),
+CONSTRAINT `pedidos_produtos_ibfk_2` FOREIGN KEY (`idprodutoPed`) REFERENCES `produto` (`idProduto`)
+
+
+INSERT INTO `pedidos_produtos` VALUES (1,1,1,NULL),(2,2,1,NULL),(3,3,1,NULL),(4,4,1,NULL);
+
+Table structure for table `produto`
+
+
+CREATE TABLE `produto` (
+`idProduto` int NOT NULL AUTO_INCREMENT,
+`descricao` varchar(70) NOT NULL,
+`categoria` enum('Eletrônico','Brinquedo','Alimentos','Informática') DEFAULT NULL,
+`precoUnitario` float NOT NULL DEFAULT '0',
+PRIMARY KEY (`idProduto`)
+
+INSERT INTO `produto` VALUES (1,'Aparelho de Som','Eletrônico',840.5),(2,'Televisão','Eletrônico',500),(3,'Bola','Eletrônico',20.5),(4,'Mause','Informática',39.5);
+
+
+Table structure for table `produto_estoque`
+
+
+CREATE TABLE `produto_estoque` (
+`idprodutoEstq` int NOT NULL,
+`idestoqueProd` int NOT NULL,
+PRIMARY KEY (`idprodutoEstq`,`idestoqueProd`),
+KEY `idestoqueProd` (`idestoqueProd`),
+CONSTRAINT `produto_estoque_ibfk_1` FOREIGN KEY (`idprodutoEstq`) REFERENCES `produto` (`idProduto`),
+CONSTRAINT `produto_estoque_ibfk_2` FOREIGN KEY (`idestoqueProd`) REFERENCES `estoque` (`idEstoque`)
+
+
+INSERT INTO `produto_estoque` VALUES (1,1),(2,2),(3,3),(4,4);
+
+
+Table structure for table `produto_vendedor`
+
+
+CREATE TABLE `produto_vendedor` (
+`idprodutoVend` int NOT NULL,
+`idvendedorProd` int NOT NULL,
+PRIMARY KEY (`idprodutoVend`,`idvendedorProd`),
+KEY `idvendedorProd` (`idvendedorProd`),
+CONSTRAINT `produto_vendedor_ibfk_1` FOREIGN KEY (`idprodutoVend`) REFERENCES `produto` (`idProduto`),
+CONSTRAINT `produto_vendedor_ibfk_2` FOREIGN KEY (`idvendedorProd`) REFERENCES `vendedor` (`idVendedor`)
+INSERT INTO `produto_vendedor` VALUES (1,1),(2,2),(3,3),(4,4);
+
+Table structure for table `vendedor`
+
+CREATE TABLE `vendedor` (
+`idVendedor` int NOT NULL AUTO_INCREMENT,
+`nome` varchar(30) NOT NULL,
+`razaoSocial` varchar(45) NOT NULL,
+`Cpf` char(14) NOT NULL,
+`Cnpj` char(14) NOT NULL,
+`endereco` varchar(45) NOT NULL,
+`place` varchar(45) NOT NULL,
+PRIMARY KEY (`idVendedor`),
+UNIQUE KEY `razaoSocial` (`razaoSocial`),
+UNIQUE KEY `Cpf` (`Cpf`),
+UNIQUE KEY `Cnpj` (`Cnpj`)
+
+INSERT INTO `vendedor` VALUES (1,'Nelso','Artigos','26547895809','25489745898704','Rua 13 n 478','São Paulo'),(2,'Robson','Eletrõnico','45847895809','96489745898704','Rua Santos n 54','Santos'),(3,'Carlos','Alimentos','32147895807','32589745898704','Rua Salgueiro n 47','Rio de Janeiro'),(4,'Daniel','Informática','47847895809','75289745898704','Rua Magalhães n 165','Campinas');
+Dump 2022-09-20 17:53:35
